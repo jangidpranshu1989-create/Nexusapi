@@ -1,32 +1,38 @@
 import os
-import smtplib
-from email.message import EmailMessage
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-GMAIL_ADDRESS = os.getenv("GMAIL_ADDRESS")
-GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+FROM_EMAIL = "onboarding@resend.dev"
+
 
 def send_otp_email(to_email: str, otp_code: str) -> bool:
-    if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
-        print("WARNING: Email service credentials missing in .env")
+    if not RESEND_API_KEY:
+        print("WARNING: RESEND_API_KEY not set in environment")
         return False
-        
-    msg = EmailMessage()
-    msg["Subject"] = "Your NexusAPI Verification Code"
-    msg["From"] = GMAIL_ADDRESS
-    msg["To"] = to_email
-    
-    body = f"Your verification code is: {otp_code}\n\nThis code will expire in 10 minutes."
-    msg.set_content(body)
-    
+
     try:
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.starttls()
-            server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
-            server.send_message(msg)
-        return True
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {RESEND_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "from": FROM_EMAIL,
+                "to": [to_email],
+                "subject": "Your NexusAPI Verification Code",
+                "text": f"Your verification code is: {otp_code}\n\nThis code will expire in 10 minutes."
+            },
+            timeout=10
+        )
+        if response.status_code == 200:
+            return True
+        else:
+            print(f"WARNING: Resend API returned {response.status_code}: {response.text}")
+            return False
     except Exception as e:
-        print(f"WARNING: Failed to send email due to exception: {str(e)}")
+        print(f"WARNING: Failed to send email due to exception: {e}")
         return False

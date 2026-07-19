@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - NexusAPI</title>
+    <link rel="manifest" href="/manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: '#6C5CE7', darkbg: '#0a0a0f', darksurface: '#13131a' }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-darkbg text-gray-200 min-h-screen flex flex-col">
+
+    <nav class="border-b border-gray-800 bg-darksurface/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/" class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded bg-brand flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(108,92,231,0.5)]">N</div>
+                    <span class="font-bold text-xl tracking-tight text-white">NexusAPI</span>
+                </a>
+
+                <div id="nav-guest" class="hidden items-center gap-4">
+                    <a href="/login" class="text-sm font-medium text-gray-300 hover:text-white transition">Log in</a>
+                    <a href="/register" class="text-sm font-medium bg-brand hover:bg-brand/90 text-white px-4 py-2 rounded-md transition shadow-lg shadow-brand/20">Sign up</a>
+                </div>
+
+                <div id="nav-auth" class="hidden items-center gap-4">
+                    <a href="/developer-verify" class="text-sm font-medium text-gray-300 hover:text-brand transition">Dev Portal</a>
+                    <button onclick="logout()" class="text-sm font-medium border border-gray-700 hover:border-gray-500 hover:text-white px-4 py-2 rounded-md transition">Log out</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="bg-darksurface border border-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md">
+            <h2 class="text-2xl font-bold text-white mb-6 text-center">Create an Account</h2>
+            <form id="register-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
+                    <input type="text" id="name" required class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Email</label>
+                    <input type="email" id="email" required class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Password</label>
+                    <input type="password" id="password" required class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
+                </div>
+                <button type="submit" id="submit-btn" class="w-full bg-brand hover:bg-brand/90 text-white font-medium py-2 px-4 rounded-lg transition shadow-lg shadow-brand/20 mt-2">
+                    Sign Up
+                </button>
+            </form>
+            <p class="text-center text-sm text-gray-400 mt-6">
+                Already have an account? <a href="/login" class="text-brand hover:text-white transition">Log in</a>
+            </p>
+        </div>
+    </main>
+
+    <script src="/static/app.js"></script>
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submit-btn');
+            const originalText = btn.textContent;
+
+            try {
+                btn.innerHTML = '<span class="spinner"></span> Creating account...';
+                btn.disabled = true;
+
+                await apiFetch('/api/v1/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password, name })
+                });
+
+                const loginData = await apiFetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
+
+                setToken(loginData.access_token);
+                setRole(loginData.role);
+                showToast('Account created successfully');
+                setTimeout(() => { window.location.href = '/'; }, 500);
+
+            } catch (err) {
+                showToast(err.message, 'error');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Details - NexusAPI</title>
+    <link rel="manifest" href="/manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: '#6C5CE7', darkbg: '#0a0a0f', darksurface: '#13131a' }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .star { cursor: pointer; transition: color 0.2s, transform 0.2s; }
+        .star:hover { transform: scale(1.15); }
+    </style>
+</head>
+<body class="bg-darkbg text-gray-200 min-h-screen flex flex-col">
+
+    <nav class="border-b border-gray-800 bg-darksurface/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/" class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded bg-brand flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(108,92,231,0.5)]">N</div>
+                    <span class="font-bold text-xl tracking-tight text-white">NexusAPI</span>
+                </a>
+
+                <div id="nav-guest" class="hidden items-center gap-4">
+                    <a href="/login" class="text-sm font-medium text-gray-300 hover:text-white transition">Log in</a>
+                    <a href="/register" class="text-sm font-medium bg-brand hover:bg-brand/90 text-white px-4 py-2 rounded-md transition shadow-lg shadow-brand/20">Sign up</a>
+                </div>
+
+                <div id="nav-auth" class="hidden items-center gap-4">
+                    <a href="/developer-verify" class="text-sm font-medium text-gray-300 hover:text-brand transition">Dev Portal</a>
+                    <button onclick="logout()" class="text-sm font-medium border border-gray-700 hover:border-gray-500 hover:text-white px-4 py-2 rounded-md transition">Log out</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="error-container" class="hidden max-w-7xl mx-auto px-4 py-20 text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">System not found</h2>
+        <p class="text-gray-400 mb-6">The system you are looking for doesn't exist or is inactive.</p>
+        <a href="/" class="text-brand hover:text-white transition">← Back to Browse</a>
+    </div>
+
+    <div id="loading-container" class="flex-grow flex justify-center items-center py-32">
+        <span class="spinner w-10 h-10 border-4 border-t-brand"></span>
+    </div>
+
+    <main id="main-content" class="hidden flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <a href="/" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-white mb-6 transition">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Browse
+        </a>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-darksurface border border-gray-800 rounded-xl p-8 shadow-xl">
+                    <div class="flex flex-wrap items-center gap-3 mb-4">
+                        <span id="sys-category" class="px-3 py-1 rounded-md text-sm font-semibold bg-brand/10 text-brand border border-brand/20"></span>
+                        <span id="sys-complexity" class="px-3 py-1 rounded-md text-sm font-medium border"></span>
+                    </div>
+                    <h1 id="sys-title" class="text-3xl md:text-4xl font-bold text-white mb-4"></h1>
+                    <p id="sys-description" class="text-gray-300 text-lg leading-relaxed mb-6 whitespace-pre-wrap"></p>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-t border-gray-800/50">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Tech Stack</p>
+                            <p id="sys-tech" class="font-medium text-gray-200"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Setup Time</p>
+                            <p id="sys-time" class="font-medium text-gray-200"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Downloads</p>
+                            <p id="sys-downloads" class="font-medium text-gray-200"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Rating</p>
+                            <p id="sys-rating" class="font-medium text-yellow-400"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-darksurface border border-gray-800 rounded-xl p-8 shadow-xl">
+                    <h2 class="text-xl font-bold text-white mb-6">Reviews</h2>
+                    <div id="reviews-list" class="space-y-4 mb-8">
+                    </div>
+
+                    <div id="review-logged-out" class="hidden bg-darkbg border border-gray-800 rounded-lg p-4 text-center">
+                        <p class="text-gray-400 text-sm">
+                            <a href="/login" class="text-brand hover:text-white transition font-medium">Log in</a> to leave a review
+                        </p>
+                    </div>
+
+                    <div id="review-form-container" class="hidden border-t border-gray-800/50 pt-6">
+                        <h3 class="text-sm font-semibold text-gray-300 mb-3">Leave a review</h3>
+                        <div id="star-picker" class="flex gap-1 mb-4 text-2xl text-gray-600">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                        </div>
+                        <textarea id="review-comment" rows="3" placeholder="Share your experience with this system..." class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition mb-4"></textarea>
+                        <button id="submit-review-btn" class="bg-brand hover:bg-brand/90 text-white font-medium py-2 px-6 rounded-lg transition shadow-lg shadow-brand/20">
+                            Submit Review
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="bg-darksurface border border-gray-800 rounded-xl p-6 shadow-xl sticky top-24">
+                    <h3 class="text-lg font-bold text-white mb-4">Get this system</h3>
+                    <button id="download-btn" class="w-full bg-brand hover:bg-brand/90 text-white font-medium py-3 px-4 rounded-lg transition shadow-lg shadow-brand/20 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Download ZIP
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/app.js"></script>
+    <script>
+        const slug = window.location.pathname.split('/').filter(Boolean).pop();
+        let selectedRating = 0;
+
+        async function init() {
+            try {
+                const sys = await apiFetch(`/api/v1/systems/${slug}`);
+                renderSystem(sys);
+                await loadReviews();
+
+                document.getElementById('loading-container').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+            } catch (err) {
+                document.getElementById('loading-container').classList.add('hidden');
+                document.getElementById('error-container').classList.remove('hidden');
+            }
+        }
+
+        function renderSystem(sys) {
+            document.getElementById('sys-title').textContent = sys.title;
+            document.getElementById('sys-description').textContent = sys.description || 'No description provided.';
+            document.getElementById('sys-category').textContent = sys.category || 'Uncategorized';
+            document.getElementById('sys-tech').textContent = sys.tech_stack || 'N/A';
+            document.getElementById('sys-time').textContent = sys.setup_time ? `${sys.setup_time} min` : 'N/A';
+            document.getElementById('sys-downloads').textContent = sys.downloads || 0;
+            document.getElementById('sys-rating').textContent = `★ ${sys.rating ? parseFloat(sys.rating).toFixed(1) : '0.0'}`;
+
+            const comp = (sys.complexity || '').toLowerCase();
+            let compColor = 'bg-gray-800 text-gray-300 border-gray-700';
+            if (comp.includes('easy') || comp.includes('beginner') || comp.includes('low')) {
+                compColor = 'bg-green-900/30 text-green-400 border-green-800/50';
+            } else if (comp.includes('medium') || comp.includes('intermediate') || comp.includes('moderate')) {
+                compColor = 'bg-yellow-900/30 text-yellow-400 border-yellow-800/50';
+            } else if (comp.includes('hard') || comp.includes('advanced') || comp.includes('high')) {
+                compColor = 'bg-red-900/30 text-red-400 border-red-800/50';
+            }
+            const compEl = document.getElementById('sys-complexity');
+            compEl.textContent = sys.complexity || 'N/A';
+            compEl.className = `px-3 py-1 rounded-md text-sm font-medium border ${compColor}`;
+
+            document.getElementById('download-btn').addEventListener('click', () => {
+                window.location.href = `/api/v1/download/${slug}`;
+            });
+
+            if (isLoggedIn()) {
+                document.getElementById('review-form-container').classList.remove('hidden');
+            } else {
+                document.getElementById('review-logged-out').classList.remove('hidden');
+            }
+        }
+
+        async function loadReviews() {
+            const reviewsList = document.getElementById('reviews-list');
+            try {
+                const reviews = await apiFetch(`/api/v1/systems/${slug}/reviews`);
+
+                if (reviews.length === 0) {
+                    reviewsList.innerHTML = '<p class="text-gray-500 text-sm">No reviews yet.</p>';
+                    return;
+                }
+
+                reviewsList.innerHTML = reviews.map(r => `
+                    <div class="border-b border-gray-800/50 pb-4 last:border-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-medium text-white text-sm">${r.user_name}</span>
+                            <span class="text-yellow-400 text-sm">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                        </div>
+                        <p class="text-gray-400 text-sm">${r.comment || ''}</p>
+                        <p class="text-gray-600 text-xs mt-1">${new Date(r.created_at).toLocaleDateString()}</p>
+                    </div>
+                `).join('');
+            } catch (err) {
+                reviewsList.innerHTML = '<p class="text-gray-500 text-sm">Could not load reviews.</p>';
+            }
+        }
+
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.value);
+                document.querySelectorAll('.star').forEach(s => {
+                    s.style.color = parseInt(s.dataset.value) <= selectedRating ? '#FBBF24' : '#4B5563';
+                });
+            });
+        });
+
+        document.getElementById('submit-review-btn').addEventListener('click', async () => {
+            const comment = document.getElementById('review-comment').value;
+            const btn = document.getElementById('submit-review-btn');
+            const originalText = btn.textContent;
+
+            if (selectedRating === 0) {
+                showToast('Please select a star rating', 'error');
+                return;
+            }
+
+            try {
+                btn.innerHTML = '<span class="spinner"></span> Submitting...';
+                btn.disabled = true;
+
+                await apiFetch(`/api/v1/systems/${slug}/reviews`, {
+                    method: 'POST',
+                    body: JSON.stringify({ rating: selectedRating, comment })
+                });
+
+                showToast('Review submitted!');
+                document.getElementById('review-comment').value = '';
+                selectedRating = 0;
+                document.querySelectorAll('.star').forEach(s => { s.style.color = '#4B5563'; });
+                await loadReviews();
+
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>

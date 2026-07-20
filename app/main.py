@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from dotenv import load_dotenv
-from app.routes import auth, systems, reviews, categories, download, developer, system_upload, admin
+from app.routes import auth, systems, reviews, categories, download, developer, system_upload, admin, profile
 
 load_dotenv()
 
@@ -28,6 +28,7 @@ app.include_router(download.router, prefix="/api/v1/download", tags=["Download"]
 app.include_router(developer.router, prefix="/api/v1/developer", tags=["Developer"])
 app.include_router(system_upload.router, prefix="/api/v1/systems", tags=["System Upload"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
+app.include_router(profile.router, prefix="/api/v1/profile", tags=["Profile"])
 
 @app.get("/api/v1/health")
 def health_check():
@@ -52,6 +53,10 @@ def serve_developer_verify():
 @app.get("/dashboard")
 def serve_dashboard():
     return FileResponse("frontend/dashboard.html")
+
+@app.get("/profile")
+def serve_profile():
+    return FileResponse("frontend/profile.html")
 
 @app.get("/admin")
 def serve_admin():

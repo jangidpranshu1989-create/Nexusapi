@@ -106,3 +106,43 @@ function renderFloatingSubmitButton() {
 }
 
 document.addEventListener('DOMContentLoaded', renderFloatingSubmitButton);
+
+// Bottom Navigation Bar - shown on all pages, adapts based on login/role state
+function renderBottomNav() {
+    const nav = document.createElement('nav');
+    nav.id = 'bottom-nav';
+    nav.className = 'fixed bottom-0 left-0 right-0 bg-darksurface border-t border-gray-800 flex justify-around items-center h-16 z-40';
+
+    const loggedIn = isLoggedIn();
+    const role = getRole();
+
+    let items = [
+        { href: '/', icon: '🏠', label: 'Home' }
+    ];
+
+    if (loggedIn) {
+        items.push({ href: '/profile', icon: '👤', label: 'Profile' });
+        if (role === 'developer' || role === 'admin') {
+            items.push({ href: '/dashboard', icon: '➕', label: 'Submit' });
+        } else {
+            items.push({ href: '/developer-verify', icon: '🔓', label: 'Dev Portal' });
+        }
+        if (role === 'admin') {
+            items.push({ href: '/admin', icon: '⚙️', label: 'Admin' });
+        }
+    } else {
+        items.push({ href: '/login', icon: '🔑', label: 'Log in' });
+    }
+
+    nav.innerHTML = items.map(item => `
+        <a href="${item.href}" class="flex flex-col items-center justify-center text-gray-400 hover:text-brand transition text-xs gap-1">
+            <span class="text-xl">${item.icon}</span>
+            <span>${item.label}</span>
+        </a>
+    `).join('');
+
+    document.body.appendChild(nav);
+    document.body.style.paddingBottom = '4rem';
+}
+
+document.addEventListener('DOMContentLoaded', renderBottomNav);

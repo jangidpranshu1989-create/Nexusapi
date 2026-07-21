@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Submit a System - NexusAPI</title>
-<link rel="manifest" href="/manifest.json">
+<title>Developer Dashboard - NexusAPI</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = { theme: { extend: { colors: { brand: '#6C5CE7', darkbg: '#0a0a0f', darksurface: '#13131a' } } } }
@@ -13,205 +12,120 @@ tailwind.config = { theme: { extend: { colors: { brand: '#6C5CE7', darkbg: '#0a0
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
-<body class="bg-darkbg text-gray-200 min-h-screen flex flex-col">
+<body class="text-gray-200 min-h-screen flex flex-col">
 
-<nav class="border-b border-gray-800 bg-darksurface/80 backdrop-blur-md sticky top-0 z-50">
+<nav class="glass-nav sticky top-0 z-50">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 <div class="flex justify-between items-center h-16">
 <a href="/" class="flex items-center gap-2">
-<div class="w-8 h-8 rounded bg-brand flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(108,92,231,0.5)]">N</div>
-<span class="font-bold text-xl tracking-tight text-white">NexusAPI</span>
+<div class="w-8 h-8 rounded-xl bg-brand flex items-center justify-center font-bold text-white">N</div>
+<span class="font-bold text-xl text-white">NexusAPI</span>
 </a>
-<div id="nav-guest" class="hidden items-center gap-4">
-<a href="/login" class="text-sm font-medium text-gray-300 hover:text-white transition">Log in</a>
-<a href="/register" class="text-sm font-medium bg-brand hover:bg-brand/90 text-white px-4 py-2 rounded-md transition shadow-lg shadow-brand/20">Sign up</a>
-</div>
-<div id="nav-auth" class="hidden items-center gap-4">
-<a href="/developer-verify" class="text-sm font-medium text-gray-300 hover:text-brand transition">Dev Portal</a>
-<button onclick="logout()" class="text-sm font-medium border border-gray-700 hover:border-gray-500 hover:text-white px-4 py-2 rounded-md transition">Log out</button>
+<div class="flex items-center gap-3">
+<a href="/profile" class="text-sm text-gray-300 hover:text-white transition">Profile</a>
+<button onclick="logout()" class="text-sm border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-xl transition">Log out</button>
 </div>
 </div>
 </div>
 </nav>
 
-<main class="flex-grow max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+<main class="flex-grow max-w-4xl mx-auto px-4 py-10 w-full">
+    <div class="glass rounded-3xl p-8 card-hover">
+        <h1 class="text-3xl font-extrabold text-white mb-2">Developer Dashboard</h1>
+        <p class="text-gray-400 mb-8">Submit a new ready-to-deploy backend system.</p>
 
-<div id="step-1-container">
-<h1 class="text-3xl font-bold text-white mb-2">Submit a System</h1>
-<p class="text-gray-400 mb-8">Share your backend system with the NexusAPI community.</p>
+        <form id="submit-system-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">System Title</label>
+                    <input type="text" id="sys-title" class="glass-input w-full px-4 py-3 rounded-xl text-white" placeholder="e.g., URL Shortener API" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Slug (URL friendly)</label>
+                    <input type="text" id="sys-slug" class="glass-input w-full px-4 py-3 rounded-xl text-white" placeholder="e.g., url-shortener" required>
+                </div>
+            </div>
 
-<div id="not-developer" class="hidden bg-darksurface border border-yellow-800/50 rounded-xl p-6 text-center">
-<p class="text-gray-300 mb-4">You need to be a verified developer to submit a system.</p>
-<a href="/developer-verify" class="inline-block bg-brand hover:bg-brand/90 text-white font-medium py-2 px-6 rounded-lg transition">Become a Developer</a>
-</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Category</label>
+                    <select id="sys-category" class="glass-input w-full px-4 py-3 rounded-xl text-white appearance-none" required>
+                        <option value="Authentication" class="bg-darkbg">Authentication</option>
+                        <option value="Data Processing" class="bg-darkbg">Data Processing</option>
+                        <option value="Utility" class="bg-darkbg">Utility</option>
+                        <option value="Machine Learning" class="bg-darkbg">Machine Learning</option>
+                        <option value="Other" class="bg-darkbg">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Complexity</label>
+                    <select id="sys-complexity" class="glass-input w-full px-4 py-3 rounded-xl text-white appearance-none" required>
+                        <option value="Easy" class="bg-darkbg">Easy</option>
+                        <option value="Medium" class="bg-darkbg">Medium</option>
+                        <option value="Hard" class="bg-darkbg">Hard</option>
+                    </select>
+                </div>
+            </div>
 
-<form id="submit-form" class="hidden bg-darksurface border border-gray-800 rounded-xl p-8 space-y-5">
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-1">Title</label>
-<input type="text" id="title" required class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
-</div>
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-1">URL Slug (lowercase, hyphens only)</label>
-<input type="text" id="slug" required pattern="[a-z0-9-]+" class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
-</div>
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-1">Category</label>
-<select id="category" required class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand">
-<option value="">Loading categories...</option>
-</select>
-</div>
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-1">Description</label>
-<textarea id="description" rows="3" required class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition"></textarea>
-</div>
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-1">Tech Stack</label>
-<input type="text" id="tech_stack" placeholder="e.g. FastAPI, PostgreSQL" class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
-</div>
-<div class="grid grid-cols-2 gap-4">
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-1">Setup Time (minutes)</label>
-<input type="number" id="setup_time" min="1" class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
-</div>
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-1">Complexity</label>
-<select id="complexity" class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand">
-<option value="easy">Easy</option>
-<option value="medium">Medium</option>
-<option value="hard">Hard</option>
-</select>
-</div>
-</div>
-<button type="submit" id="submit-btn" class="w-full bg-brand hover:bg-brand/90 text-white font-medium py-3 px-4 rounded-lg transition shadow-lg shadow-brand/20">
-Create Listing
-</button>
-</form>
-</div>
+            <div>
+                <label class="block text-sm font-medium text-gray-400 mb-2">Short Description</label>
+                <textarea id="sys-desc" rows="2" class="glass-input w-full px-4 py-3 rounded-xl text-white resize-none" placeholder="What does this system do?" required></textarea>
+            </div>
 
-<div id="step-2-container" class="hidden bg-darksurface border border-gray-800 rounded-xl p-8">
-<h2 class="text-2xl font-bold text-white mb-2">Upload Your Code</h2>
-<p class="text-gray-400 mb-6">Listing created! Now upload a .zip file containing your project's code.</p>
+            <div>
+                <label class="block text-sm font-medium text-gray-400 mb-2">README (Markdown/Text)</label>
+                <textarea id="sys-readme" rows="5" class="glass-input w-full px-4 py-3 rounded-xl text-white resize-none font-mono text-sm" placeholder="Setup instructions, endpoints, etc."></textarea>
+            </div>
 
-<div class="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center mb-6">
-<input type="file" id="zip-file" accept=".zip" class="hidden">
-<label for="zip-file" class="cursor-pointer inline-block bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-lg transition">
-Choose ZIP file
-</label>
-<p id="file-name" class="text-gray-500 text-sm mt-3">No file chosen</p>
-</div>
-
-<button id="upload-btn" class="w-full bg-brand hover:bg-brand/90 text-white font-medium py-3 px-4 rounded-lg transition shadow-lg shadow-brand/20" disabled>
-Upload Files
-</button>
-
-<a id="view-listing-link" href="#" class="block text-center text-gray-400 hover:text-white text-sm mt-4 transition">Skip for now, view my listing</a>
-</div>
-
+            <div class="pt-4 border-t border-white/10">
+                <button type="submit" id="submit-btn" class="glass-btn-primary w-full py-4 rounded-xl text-white font-bold text-lg">
+                    Create Listing
+                </button>
+            </div>
+        </form>
+    </div>
 </main>
 
 <script src="/static/app.js"></script>
 <script>
-if (!isLoggedIn()) {
-window.location.href = '/login';
+// Authentication check
+if (!localStorage.getItem('token')) {
+    window.location.href = '/login';
 }
 
-let createdSlug = null;
+document.getElementById('submit-system-form').addEventListener('submit', async function(e) {
+    e.preventDefault(); // BUG FIX: Ye line form ko reload hone se rokegi
+    
+    const btn = document.getElementById('submit-btn');
+    const originalText = btn.textContent;
+    btn.textContent = 'Submitting...';
+    btn.disabled = true;
+    
+    const payload = {
+        title: document.getElementById('sys-title').value,
+        slug: document.getElementById('sys-slug').value,
+        category: document.getElementById('sys-category').value,
+        complexity: document.getElementById('sys-complexity').value,
+        description: document.getElementById('sys-desc').value,
+        readme: document.getElementById('sys-readme').value
+    };
 
-async function init() {
-try {
-const categories = await apiFetch('/api/v1/categories/');
-const select = document.getElementById('category');
-select.innerHTML = categories.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
-document.getElementById('submit-form').classList.remove('hidden');
-} catch (err) {
-document.getElementById('not-developer').classList.remove('hidden');
-}
-}
-
-document.getElementById('submit-form').addEventListener('submit', async (e) => {
-e.preventDefault();
-const btn = document.getElementById('submit-btn');
-const originalText = btn.textContent;
-
-const payload = {
-title: document.getElementById('title').value,
-slug: document.getElementById('slug').value,
-category: document.getElementById('category').value,
-description: document.getElementById('description').value,
-tech_stack: document.getElementById('tech_stack').value || null,
-setup_time: document.getElementById('setup_time').value ? parseInt(document.getElementById('setup_time').value) : null,
-complexity: document.getElementById('complexity').value
-};
-
-try {
-btn.innerHTML = '<span class="spinner"></span> Creating...';
-btn.disabled = true;
-
-await apiFetch('/api/v1/systems/', {
-method: 'POST',
-body: JSON.stringify(payload)
+    try {
+        const response = await apiFetch('/api/v1/systems/', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        
+        // Success
+        alert('System created successfully! Next step: Upload ZIP in your profile.');
+        document.getElementById('submit-system-form').reset();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
 });
-
-createdSlug = payload.slug;
-showToast('Listing created!');
-document.getElementById('step-1-container').classList.add('hidden');
-document.getElementById('step-2-container').classList.remove('hidden');
-document.getElementById('view-listing-link').href = `/systems/${createdSlug}`;
-
-} catch (err) {
-if (err.message.includes('Developer or admin')) {
-document.getElementById('submit-form').classList.add('hidden');
-document.getElementById('not-developer').classList.remove('hidden');
-} else {
-showToast(err.message, 'error');
-}
-btn.disabled = false;
-btn.textContent = originalText;
-}
-});
-
-document.getElementById('zip-file').addEventListener('change', (e) => {
-const file = e.target.files[0];
-document.getElementById('file-name').textContent = file ? file.name : 'No file chosen';
-document.getElementById('upload-btn').disabled = !file;
-});
-
-document.getElementById('upload-btn').addEventListener('click', async () => {
-const fileInput = document.getElementById('zip-file');
-const file = fileInput.files[0];
-const btn = document.getElementById('upload-btn');
-const originalText = btn.textContent;
-
-if (!file || !createdSlug) return;
-
-const formData = new FormData();
-formData.append('file', file);
-
-try {
-btn.innerHTML = '<span class="spinner"></span> Uploading...';
-btn.disabled = true;
-
-const token = getToken();
-const response = await fetch(`/api/v1/systems/${createdSlug}/upload-files`, {
-method: 'POST',
-headers: { 'Authorization': `Bearer ${token}` },
-body: formData
-});
-
-const data = await response.json();
-if (!response.ok) throw new Error(data.detail || 'Upload failed');
-
-showToast('Files uploaded successfully!');
-setTimeout(() => { window.location.href = `/systems/${createdSlug}`; }, 800);
-
-} catch (err) {
-showToast(err.message, 'error');
-btn.disabled = false;
-btn.textContent = originalText;
-}
-});
-
-init();
 </script>
 </body>
 </html>

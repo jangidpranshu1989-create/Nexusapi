@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings - NexusAPI</title>
+<link rel="manifest" href="/manifest.json">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: { brand: '#6C5CE7', darkbg: '#0a0a0f', darksurface: '#13131a' } } } }
+</script>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-darkbg text-gray-200 min-h-screen flex flex-col">
+
+<nav class="border-b border-gray-800 bg-darksurface/80 backdrop-blur-md sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<a href="/" class="flex items-center gap-2">
+<div class="w-8 h-8 rounded bg-brand flex items-center justify-center font-bold text-white">N</div>
+<span class="font-bold text-xl text-white">NexusAPI</span>
+</a>
+<button onclick="logout()" class="text-sm border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-md transition">Log out</button>
+</div>
+</div>
+</nav>
+
+<main class="flex-grow max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+<h1 class="text-2xl font-bold text-white mb-6">Settings</h1>
+
+<div class="flex gap-2 mb-6 overflow-x-auto">
+<button onclick="showTab('profile')" id="tab-profile" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white">Profile</button>
+<button onclick="showTab('appearance')" id="tab-appearance" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-darksurface text-gray-400">Appearance</button>
+<button onclick="showTab('security')" id="tab-security" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-darksurface text-gray-400">Security</button>
+<button onclick="showTab('notifications')" id="tab-notifications" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-darksurface text-gray-400">Notifications</button>
+<button onclick="showTab('data')" id="tab-data" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-darksurface text-gray-400">Data</button>
+<button onclick="showTab('about')" id="tab-about" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-darksurface text-gray-400">About</button>
+</div>
+
+<div id="panel-profile" class="bg-darksurface border border-gray-800 rounded-xl p-6 space-y-4">
+<div>
+<label class="block text-sm text-gray-400 mb-1">Full Name</label>
+<input id="set-name" class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white">
+</div>
+<div>
+<label class="block text-sm text-gray-400 mb-1">Email</label>
+<input id="set-email" disabled class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-gray-500">
+</div>
+<div>
+<label class="block text-sm text-gray-400 mb-1">Bio</label>
+<textarea id="set-bio" rows="3" class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white"></textarea>
+</div>
+<div>
+<label class="block text-sm text-gray-400 mb-1">Avatar URL</label>
+<input id="set-avatar" placeholder="https://..." class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white">
+</div>
+<button onclick="saveProfile()" class="bg-brand hover:bg-brand/90 text-white px-6 py-2 rounded-lg font-medium">Save Profile</button>
+</div>
+
+<div id="panel-appearance" class="hidden bg-darksurface border border-gray-800 rounded-xl p-6 space-y-4">
+<label class="block text-sm text-gray-400 mb-2">Accent Color</label>
+<div class="flex gap-3">
+<button onclick="setAccent('#6C5CE7')" class="w-10 h-10 rounded-full" style="background:#6C5CE7"></button>
+<button onclick="setAccent('#10B981')" class="w-10 h-10 rounded-full" style="background:#10B981"></button>
+<button onclick="setAccent('#EF4444')" class="w-10 h-10 rounded-full" style="background:#EF4444"></button>
+<button onclick="setAccent('#F59E0B')" class="w-10 h-10 rounded-full" style="background:#F59E0B"></button>
+<button onclick="setAccent('#3B82F6')" class="w-10 h-10 rounded-full" style="background:#3B82F6"></button>
+</div>
+<p class="text-gray-500 text-xs mt-2">Selected color is saved to your account (visual theming applied on future update).</p>
+</div>
+
+<div id="panel-security" class="hidden bg-darksurface border border-gray-800 rounded-xl p-6 space-y-4">
+<div>
+<label class="block text-sm text-gray-400 mb-1">Current Password</label>
+<input type="password" id="set-current-pass" class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white">
+</div>
+<div>
+<label class="block text-sm text-gray-400 mb-1">New Password</label>
+<input type="password" id="set-new-pass" class="w-full bg-darkbg border border-gray-700 rounded-lg px-4 py-2 text-white">
+</div>
+<button onclick="changePassword()" class="bg-brand hover:bg-brand/90 text-white px-6 py-2 rounded-lg font-medium">Change Password</button>
+</div>
+
+<div id="panel-notifications" class="hidden bg-darksurface border border-gray-800 rounded-xl p-6 space-y-4">
+<label class="flex items-center gap-3">
+<input type="checkbox" id="set-email-notif" class="w-5 h-5">
+<span class="text-gray-300">Email me about reviews and updates</span>
+</label>
+<button onclick="saveNotifications()" class="bg-brand hover:bg-brand/90 text-white px-6 py-2 rounded-lg font-medium">Save</button>
+</div>
+
+<div id="panel-data" class="hidden bg-darksurface border border-gray-800 rounded-xl p-6 space-y-4">
+<button onclick="exportData()" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium">Export My Data</button>
+<div class="border-t border-gray-800 pt-4">
+<p class="text-red-400 text-sm mb-2">Danger zone</p>
+<button onclick="deleteAccount()" class="bg-red-700 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-medium">Delete My Account</button>
+</div>
+</div>
+
+<div id="panel-about" class="hidden bg-darksurface border border-gray-800 rounded-xl p-6">
+<h3 class="text-white font-bold mb-2">NexusAPI</h3>
+<p class="text-gray-400 text-sm">An open-source hub for ready-to-deploy backend systems.</p>
+<p class="text-gray-500 text-xs mt-4">Version 1.0</p>
+</div>
+
+</main>
+
+<script src="/static/app.js"></script>
+<script>
+if (!isLoggedIn()) window.location.href = '/login';
+
+let currentAccent = '#6C5CE7';
+
+async function init() {
+    const p = await apiFetch('/api/v1/settings/full-profile');
+    document.getElementById('set-name').value = p.name || '';
+    document.getElementById('set-email').value = p.email || '';
+    document.getElementById('set-bio').value = p.bio || '';
+    document.getElementById('set-avatar').value = p.avatar_url || '';
+    document.getElementById('set-email-notif').checked = !!p.email_notifications;
+    currentAccent = p.accent_color || '#6C5CE7';
+}
+
+function showTab(name) {
+    ['profile','appearance','security','notifications','data','about'].forEach(t => {
+        document.getElementById('panel-'+t).classList.toggle('hidden', t !== name);
+        document.getElementById('tab-'+t).className = t === name
+            ? 'tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-brand text-white'
+            : 'tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-darksurface text-gray-400';
+    });
+}
+
+async function saveProfile() {
+    try {
+        await apiFetch('/api/v1/settings/profile', {
+            method: 'PUT',
+            body: JSON.stringify({
+                name: document.getElementById('set-name').value,
+                bio: document.getElementById('set-bio').value,
+                avatar_url: document.getElementById('set-avatar').value
+            })
+        });
+        showToast('Profile updated');
+    } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function setAccent(color) {
+    currentAccent = color;
+    try {
+        await apiFetch('/api/v1/settings/appearance', { method: 'PUT', body: JSON.stringify({ accent_color: color }) });
+        showToast('Accent color saved');
+    } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function changePassword() {
+    const current = document.getElementById('set-current-pass').value;
+    const next = document.getElementById('set-new-pass').value;
+    if (!current || !next) { showToast('Fill both password fields', 'error'); return; }
+    try {
+        await apiFetch('/api/v1/settings/password', {
+            method: 'PUT',
+            body: JSON.stringify({ current_password: current, new_password: next })
+        });
+        showToast('Password changed');
+        document.getElementById('set-current-pass').value = '';
+        document.getElementById('set-new-pass').value = '';
+    } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function saveNotifications() {
+    try {
+        await apiFetch('/api/v1/settings/notifications', {
+            method: 'PUT',
+            body: JSON.stringify({ email_notifications: document.getElementById('set-email-notif').checked })
+        });
+        showToast('Notification preferences saved');
+    } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function exportData() {
+    const data = await apiFetch('/api/v1/settings/export-data');
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'nexusapi-my-data.json';
+    a.click();
+}
+
+async function deleteAccount() {
+    if (!confirm('This will permanently delete your account. Are you sure?')) return;
+    try {
+        await apiFetch('/api/v1/settings/account', { method: 'DELETE' });
+        clearToken();
+        clearRole();
+        window.location.href = '/';
+    } catch (e) { showToast(e.message, 'error'); }
+}
+
+init();
+</script>
+</body>
+</html>
